@@ -1,0 +1,83 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import  seaborn as sns
+# extracting dataset
+pd.set_option('display.max_columns',None)
+df = pd.read_csv(r"C:\Users\prosper\Downloads\DHL_Facilities.csv")
+print(df.info())
+print(df.shape)
+print(df.dtypes)
+print(df.describe())
+
+#checking if our dataset has duplicates
+df_duplicate = df.duplicated().sum()
+print(f'we have {df_duplicate} duplicates')
+
+#checking if our dataset has blank rows
+blank_df = df.isna().sum()
+print(blank_df)
+
+#get time column from last_pickup
+df[['TIME','LAST_PICKUP']] = df['LAST_PICKUP'].str.split('[', 1,expand= True)
+print(df)
+
+#data cleaning
+df['TIME'] = df['TIME'].str.replace(' ', '')
+#df['TIME'] = pd.to_datetime(df['TIME'])
+
+#TOP 10 city_wise number of pickups made
+city_pickup = df.groupby('CITY')['LAST_PICKUP'].nunique().sort_values()
+print(city_pickup)
+#city_pickup.plot(kind='bar')
+#plt.show()
+
+#top 10 city_wise no of objects serviced
+city_object = df.groupby('CITY')['OBJECTID'].nunique().sort_values(ascending = False)
+print(city_object)
+#city_object.plot(kind='bar')
+#plt.show()
+
+#state-wise no of cites, where DHfl services are provided
+state_city = df.groupby('STATE')['CITY'].nunique().sort_values(ascending = False)
+print(state_city)
+#state_city.plot(kind='bar')
+
+#zip code wise number of objects serviced
+zip_object = df.groupby('ZIP').nunique()['OBJECTID'].sort_values(ascending= False)
+print(zip_object)
+#zip_object.plot(kind='bar')
+
+#Total number of objects ids serviced by dhl
+objectid_count = df['OBJECTID'].count()
+print(f'we have {objectid_count} object ids')
+
+location_th = df['LOCATION_TH'].value_counts()
+print(location_th)
+
+#plt.pie(location_th,labels = location_th.index,autopct='%1.1f%%')
+#plt.show()
+
+print(df)
+
+# checking morning pickups
+check_am = df[df['TIME'].str.contains('Am')]
+print(len(check_am))
+
+# afternoon/evening time pickups
+check_pm = df[df['TIME'].str.contains('Pm')]
+print(len(check_pm))
+
+#most pickup time
+most_am_pm = df['TIME'].value_counts()
+print(most_am_pm)
+sns.barplot(x = most_am_pm.index ,y= most_am_pm.values )
+plt.xticks(rotation = 'vertical')
+plt.title('Most pickup time')
+#plt.show()
+
+print(df.dtypes)
+print(df['TIME'])
+timeandlocation = df.query("TIME == '3:30Pm' & LOCATION_TY == 'Drop Box'")
+
+print(timeandlocation)
