@@ -1,0 +1,68 @@
+import json
+import pandas as pd
+import yfinance as yf
+tesla = yf.Ticker("TSLA")
+print(tesla)
+tesla_data = tesla.history(period="max")
+tesla_data.reset_index(inplace=True)
+print(tesla_data)
+print(tesla_data.head())
+
+from bs4 import BeautifulSoup
+import requests
+
+
+url = 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/revenue.htm'
+data= requests.get(url).text
+print(data)
+soup = BeautifulSoup(data, 'html.parser')
+tesla_revenue = pd.DataFrame(columns=["Date", "Revenue"])
+for row in soup.find("tbody").find_all('tr'):
+    col = row.find_all("td")
+    date = col[0].text
+    revenue = col[1].text
+tesla_revenue = tesla_revenue._append({"Date":date,"Revenue":revenue},ignore_index=True)
+print(tesla_revenue.tail())
+
+
+
+kay = soup.find_all('tbody')
+print(kay)
+
+
+Gme = yf.Ticker("GME")
+print(Gme)
+gme_data = Gme.history(period="max")
+gme_data.reset_index(inplace=True)
+print(gme_data.head())
+
+
+url = 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/stock.html'
+data= requests.get(url).text
+soup = BeautifulSoup(data, 'html.parser')
+gme_revenue = pd.DataFrame(columns=["Date", "Revenue"])
+for row in soup.find("tbody").find_all('tr'):
+    col = row.find_all("td")
+    date = col[0].text
+    revenue = col[1].text
+gme_revenue = gme_revenue._append({"Date":date,"Revenue":revenue},ignore_index=True)
+print(gme_revenue.tail())
+import matplotlib.pyplot as plt
+gme_data['Date'] = gme_data['Date'].dt.year
+gme_data_stock = gme_data.groupby('Date')['Open'].mean().head
+print(gme_data_stock)
+tesla_data.plot(x = 'Date',y= 'Open', kind= 'line')
+plt.title('Average Stock price for GME')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
